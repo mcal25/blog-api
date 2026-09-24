@@ -7,3 +7,7 @@ export async function submitSignup() {
 export async function submitLogin() {
     
 }
+
+export async function submitLogout() {
+    
+}
