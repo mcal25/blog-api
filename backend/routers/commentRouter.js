@@ -1,15 +1,15 @@
 import { Router } from "express";
 import {
-  getAllComments,
+  getAllCommentsByPostId,
   getCommentById,
   deleteCommentById,
   addComment,
   editCommentById,
 } from "../controllers/commentController.js";
 
-export const commentRouter = Router();
+export const commentRouter = Router({mergeParams: true});
 
-commentRouter.get('/', getAllComments);
+commentRouter.get('/', getAllCommentsByPostId);
 commentRouter.get('/:commentid', getCommentById);
 commentRouter.post('/', addComment);
 commentRouter.put('/:commentid', editCommentById);
