@@ -5,10 +5,6 @@ export const postRouter = Router();
 
 postRouter.get("/collection", getAllPosts);
 postRouter.get("/:postid", getPostById);
-
 postRouter.post("/", addPost);
-
 postRouter.put("/:postid", editPostById);
-
 postRouter.delete("/:postid", deletePostById);
-
