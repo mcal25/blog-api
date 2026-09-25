@@ -9,15 +9,17 @@ export async function submitSignup(req, res, next) {
     const password = req.body.password;
 
     if (!username || !password) {
-      return res.status(400).send("You need a pw and un, bozo");
+      return res.status(400).json({ error: "Username and password are required" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 12);
-    await prisma.user.create({
+    const user = await prisma.user.create({
       data: { username, password: hashedPassword },
+      // Return only public account fields; never include the stored password hash in the API response.
+      select: { id: true, username: true, isAdmin: true },
     });
 
-    res.redirect("/");
+    return res.status(201).json({ user });
   } catch (error) {
     next(error);
   }
