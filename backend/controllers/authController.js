@@ -50,9 +50,7 @@ export function submitLogin(req, res, next) {
   })(req, res, next);
 }
 
-export async function submitLogout(req, res, next) {
-    req.logout((error) => {
-        if (error) return next(error);
-        res.redirect("/collection")
-    })
+export function submitLogout(req, res) {
+  // JWTs are stateless, so the client clears its saved token after this acknowledgment.
+  return res.sendStatus(204);
 }
