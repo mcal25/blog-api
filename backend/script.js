@@ -1,3 +1,4 @@
+import bcrypt from "bcryptjs";
 import { prisma } from "./lib/prisma.js";
 
 const users = [
@@ -12,12 +13,19 @@ const users = [
 ];
 
 async function main() {
+  const usersWithHashedPasswords = await Promise.all(
+    users.map(async (user) => ({
+      ...user,
+      password: await bcrypt.hash(user.password, 12),
+    })),
+  );
+
   // Clear dependent records first so the seed can be safely rerun.
   await prisma.comment.deleteMany();
   await prisma.post.deleteMany();
   await prisma.user.deleteMany();
 
-  for (const user of users) {
+  for (const user of usersWithHashedPasswords) {
     await prisma.user.create({ data: user });
   }
 
