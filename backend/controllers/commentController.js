@@ -17,34 +17,66 @@ export async function getCommentById(req, res, next) {
 }
 
 export async function editCommentById(req, res, next) {
-  const comment = await prisma.comment.update({
+  // Look up the comment first so authorization can use its actual database owner.
+  const existingComment = await prisma.comment.findUnique({
     where: { id: Number(req.params.commentid) },
+  });
+
+  if (!existingComment) {
+    return res.status(404).json({ error: "Comment not found" });
+  }
+
+  // Randy's admin account may moderate any comment; other users may edit only their own.
+  if (!req.user.isAdmin && existingComment.userId !== req.user.id) {
+    return res.status(403).json({ error: "You can only edit your own comments" });
+  }
+
+  const comment = await prisma.comment.update({
+    where: { id: existingComment.id },
     data: { body: req.body.body },
   });
-  res.status(204).json();
+
+  // A 204 response has no body, so end it once instead of trying to send JSON too.
+  return res.sendStatus(204);
 }
 
 export async function deleteCommentById(req, res, next) {
-    const comment = await prisma.comment.delete({
-        where: {id: Number(req.params.commentid)},
-    });
-    res.send(200).json();
+  // Look up the comment first so authorization can use its actual database owner.
+  const existingComment = await prisma.comment.findUnique({
+    where: { id: Number(req.params.commentid) },
+  });
+
+  if (!existingComment) {
+    return res.status(404).json({ error: "Comment not found" });
+  }
+
+  // Randy's admin account may moderate any comment; other users may delete only their own.
+  if (!req.user.isAdmin && existingComment.userId !== req.user.id) {
+    return res.status(403).json({ error: "You can only delete your own comments" });
+  }
+
+  await prisma.comment.delete({
+    where: { id: existingComment.id },
+  });
+
+  // Send one body-free success response after deletion.
+  return res.sendStatus(204);
 }
 
 export async function addComment(req, res, next) {
-    console.log(req.params);
-    const comment = await prisma.comment.create({
-        data: {
-            body: req.body.body,
-            postId: req.params.postId,
-            userId: req.params.userid,
-            post: {
-                connect: {id: Number(req.params.postid)}
-            },
-            user: {
-                connect: {id: 10},
-            }
-        }
-    });
-    res.send(204).json();
+  // Derive the post from the nested route and the author from the verified JWT, never client-supplied IDs.
+  const comment = await prisma.comment.create({
+    data: {
+      body: req.body.body,
+      post: {
+        connect: { id: Number(req.params.postid) },
+      },
+      user: {
+        connect: { id: req.user.id },
+      },
+    },
+  });
+
+  // Return the created comment so clients can use its ID and confirm its author.
+  return res.status(201).json(comment);
 }

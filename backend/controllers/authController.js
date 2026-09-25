@@ -50,4 +50,9 @@ export function submitLogin(req, res, next) {
   })(req, res, next);
 }
 
-export async function submitLogout() {}
+export async function submitLogout(req, res, next) {
+    req.logout((error) => {
+        if (error) return next(error);
+        res.redirect("/collection")
+    })
+}
