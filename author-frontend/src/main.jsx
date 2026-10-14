@@ -9,13 +9,13 @@ createRoot(document.getElementById('root')).render(
   <StrictMode>
     
       <BrowserRouter>
-      
+      <BlogContextProvider>
         <Routes>
-          <BlogContextProvider>
+          
             <Route path="*" element={ <App /> }></Route>
-          </BlogContextProvider>
+          
         </Routes>
-      
+      </BlogContextProvider>
       </BrowserRouter>
     
   </StrictMode>,

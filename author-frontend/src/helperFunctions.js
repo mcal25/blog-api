@@ -1,5 +1,5 @@
 const helperURLFunction = (endPath) => {
-    return `http://localhost3000/${endPath}`;
+    return `http://localhost:5173/${endPath}`;
 }
 
 export { helperURLFunction };
