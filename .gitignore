@@ -9,6 +9,7 @@ lerna-debug.log*
 
 notes.txt
 
+_Gemini - direct access to Google AI.html
 node_modules
 dist
 dist-ssr
