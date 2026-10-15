@@ -2,6 +2,7 @@ import { useState, useContext, useEffect } from "react";
 import { BlogContext } from "./BlogContext";
 import { helperURLFunction } from "./helperFunctions";
 import { useParams } from "react-router-dom";
+import { Comments } from "./Comments";
 
 const Post = () => {
   const [post, setPost] = useState();
@@ -24,8 +25,9 @@ const Post = () => {
 
   return (
     <div>
-      <h3>{post?.title}</h3>
-      <p>{post?.body}</p>
+      <h3 className="text-4xl">{post?.title}</h3>
+      <p className="mt-5">{post?.body}</p>
+      <Comments />
     </div>
   );
 };

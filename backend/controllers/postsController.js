@@ -16,6 +16,7 @@ export async function getAllPostsForPublic(req, res) {
 }
 
 export async function getPostById(req, res) {
+  console.log(Number(req.params.postid));
   const post = await prisma.post.findFirst({
     // Combining ID and published status makes a draft look unavailable to public readers.
     where: { id: Number(req.params.postid), isPublished: true },
