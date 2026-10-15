@@ -5,6 +5,7 @@ import viteLogo from './assets/vite.svg'
 import { BrowserRouter, Route, Link, Routes } from 'react-router-dom';
 import './App.css'
 import { Homepage } from './Hompage.jsx';
+import { Post } from './Post.jsx';
 
 function App() {
   
@@ -12,6 +13,7 @@ function App() {
     <>
      <Routes>
       <Route path="*" element={<Homepage />} />
+      <Route path="/post/:postId" element={<Post />}/>
      </Routes>
     </>
   )
