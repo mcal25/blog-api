@@ -26,8 +26,12 @@ export async function submitSignup(req, res, next) {
 }
 
 export function submitLogin(req, res, next) {
+
+  console.log("submitLogin backend req", req.body);
+
   passport.authenticate("local", { session: false }, (error, user, info) => {
     if (error) {
+      console.log('Are we hitting this error section?:', "We sure are");
       return next(error);
     }
 
