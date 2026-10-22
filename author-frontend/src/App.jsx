@@ -11,10 +11,7 @@ function App() {
   
   return (
     <>
-     <Routes>
-      <Route path="*" element={<Homepage />} />
-      <Route path="/post/:postId" element={<Post />}/>
-     </Routes>
+
     </>
   )
 }

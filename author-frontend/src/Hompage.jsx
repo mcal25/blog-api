@@ -43,6 +43,20 @@ const Homepage = () => {
         password: password,
       }),
     });
+
+    if (response.ok) {
+      const data = await response.json();
+
+      localStorage.setItem("access_token", data.token);
+
+      if (data.user) {
+        localStorage.setItem("user", JSON.stringify(data.user));
+      }
+      
+    } else {
+      const errorData = await response.json();
+      console.error("Login failed:", errorData);
+    }
   }
 
   return (
