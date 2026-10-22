@@ -58,5 +58,6 @@ export function submitLogin(req, res, next) {
 
 export function submitLogout(req, res) {
   // JWTs are stateless, so the client clears its saved token after this acknowledgment.
+  console.log('Hitting backend logout function?:', 'hitting backend logout');
   return res.sendStatus(204);
 }
