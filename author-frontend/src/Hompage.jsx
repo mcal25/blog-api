@@ -9,6 +9,19 @@ const Homepage = () => {
   const { pathname } = useLocation();
 
   const { posts } = useContext(BlogContext);
+  
+  let greeting = null;
+  const token = localStorage.getItem("access_token");
+  if (token && localStorage.getItem("user")) {
+    try {
+      const user = JSON.parse(localStorage.getItem("user"));
+      if (user && user.username) {
+        greeting = `Welcome back, ${user.username}!`;
+      }
+    } catch(err) {
+      console.log(err);
+    }
+  }
 
   async function doLogin(e) {
     // console.log("EEEEEEEEEE:", e);
@@ -61,7 +74,11 @@ const Homepage = () => {
 
   return (
     <>
-      <h1 className="text-3xl font-bold underline">Author Frontend</h1>
+      {greeting ? (
+        <h1 className={styles.mainHeader}>{greeting}</h1>
+      ) : (
+        <h1 className={styles.mainHeader}>Author Frontend</h1>
+      )}
       <form method="POST">
         <label htmlFor="usernameInput">Username</label>
         <input
