@@ -8,9 +8,9 @@ import { helperURLFunction } from "./helperFunctions";
 const Homepage = () => {
   const { pathname } = useLocation();
 
-  const { posts } = useContext(BlogContext);
+  const { posts, greeting, setGreeting } = useContext(BlogContext);
 
-  const [greeting, setGreeting] = useState(null);
+  
 
   useEffect(() => {
     const token = localStorage.getItem("access_token");

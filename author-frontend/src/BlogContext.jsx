@@ -4,11 +4,13 @@ import { helperURLFunction } from "./helperFunctions";
 export const BlogContext = createContext({
   posts: [],
   comments: [],
+  greeting: null,
 });
 
 export function BlogContextProvider({ children }) {
   const [posts, setPosts] = useState([]);
   const [comments, setComments] = useState([]);
+  const [greeting, setGreeting] = useState(null);
 
   useEffect(() => {
     async function getAllPosts() {
@@ -31,6 +33,10 @@ export function BlogContextProvider({ children }) {
   const contextValue = {
     posts,
     comments,
+    greeting,
+    setPosts,
+    setComments,
+    setGreeting
   };
 
   return (

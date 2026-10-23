@@ -1,19 +1,26 @@
 import { Outlet } from "react-router-dom";
 import { helperURLFunction } from "./helperFunctions";
+import { BlogContext } from "./BlogContext";
+import { useContext } from "react";
 
 const Layout = () => {
+  const { greeting, setGreeting } = useContext(BlogContext);
+
   async function doLogout(e) {
-    console.log('Hitting doLogout?:', 'hitting do logout');
+    console.log("Hitting doLogout?:", "hitting do logout");
+
     e.preventDefault();
+
     const response = await fetch(helperURLFunction(`auth/logout`), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
     }).then(() => {
-        localStorage.clear();
+      localStorage.clear();
     });
-    
+
+    setGreeting("Bloggy McBlogFace");
   }
 
   return (
