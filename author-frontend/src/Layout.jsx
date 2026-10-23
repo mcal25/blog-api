@@ -4,7 +4,7 @@ import { BlogContext } from "./BlogContext";
 import { useContext } from "react";
 
 const Layout = () => {
-  const { greeting, setGreeting } = useContext(BlogContext);
+  const { user, setUser } = useContext(BlogContext);
 
   async function doLogout(e) {
     console.log("Hitting doLogout?:", "hitting do logout");
@@ -19,8 +19,9 @@ const Layout = () => {
     }).then(() => {
       localStorage.clear();
     });
-
-    setGreeting("Bloggy McBlogFace");
+    // setLoggedIn(false);
+    // setGreeting("Bloggy McBlogFace");
+    setUser(null);
   }
 
   return (

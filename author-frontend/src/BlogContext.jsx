@@ -4,13 +4,13 @@ import { helperURLFunction } from "./helperFunctions";
 export const BlogContext = createContext({
   posts: [],
   comments: [],
-  greeting: null,
+  user: {},
 });
 
 export function BlogContextProvider({ children }) {
   const [posts, setPosts] = useState([]);
   const [comments, setComments] = useState([]);
-  const [greeting, setGreeting] = useState(null);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     async function getAllPosts() {
@@ -18,11 +18,9 @@ export function BlogContextProvider({ children }) {
         // If response is not what we want try using data instead of blogData
 
         const data = await fetch(helperURLFunction("post/collection"));
-        console.log(data.statusText);
         const blogData = await data.json();
 
         setPosts(blogData);
-        console.log(blogData);
       } catch (err) {
         console.error(err);
       }
@@ -33,10 +31,10 @@ export function BlogContextProvider({ children }) {
   const contextValue = {
     posts,
     comments,
-    greeting,
+    user,
     setPosts,
     setComments,
-    setGreeting
+    setUser,
   };
 
   return (

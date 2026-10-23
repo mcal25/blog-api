@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import styles from "./Homepage.module.css";
-import { useLocation, Link } from "react-router-dom";
+import { useLocation, Link, data } from "react-router-dom";
 import { BlogContext } from "./BlogContext";
 import { PostCard } from "./PostCard";
 import { helperURLFunction } from "./helperFunctions";
@@ -8,48 +8,32 @@ import { helperURLFunction } from "./helperFunctions";
 const Homepage = () => {
   const { pathname } = useLocation();
 
-  const { posts, greeting, setGreeting } = useContext(BlogContext);
+  const { posts, user, setUser } = useContext(BlogContext);
+  const [loading, setLoading] = useState(true);
 
-  
+  const ACCESS_TOKEN_KEY = 'access_token';
+  const USER_KEY = 'user';
 
-  useEffect(() => {
-    const token = localStorage.getItem("access_token");
-    if (token && localStorage.getItem("user")) {
+    useEffect(() => {
+    const token = localStorage.getItem(ACCESS_TOKEN_KEY);
+    if (token && localStorage.getItem(USER_KEY)) {
       try {
-        const user = JSON.parse(localStorage.getItem("user"));
-        if (user && user.username) {
-          setGreeting(`Welcome back, ${user.username}!`);
-        }
+          console.log(user);
+          setUser(JSON.parse(localStorage.getItem(USER_KEY)));
       } catch (err) {
         console.log(err);
       }
     }
+    setLoading(false);
   }, []);
 
-  // let greeting = null;
-
   async function doLogin(e) {
-    // console.log("EEEEEEEEEE:", e);
-    // const usernameInput = document.getElementById("usernameInput").textContent;
-    // const passwordInput = document.getElementById("passwordInput").textContent;
-    // console.log("UN:", usernameInput);
-    // console.log("PW:", passwordInput);
 
     e.preventDefault();
 
     const formData = new FormData(e.currentTarget.form);
-    console.log(formData);
     const username = formData.get("usernameInput");
     const password = formData.get("passwordInput");
-    console.log(username);
-    console.log(password);
-
-    // await fetch(helperURLFunction(`auth/login`), {
-    //   method: "POST",
-    //   body: {
-    //     username: username,
-    //     password: password,
-    //   },
 
     const response = await fetch(helperURLFunction(`auth/login`), {
       method: "POST",
@@ -64,12 +48,14 @@ const Homepage = () => {
 
     if (response.ok) {
       const data = await response.json();
-
-      localStorage.setItem("access_token", data.token);
+      
+      console.log('Data at line 50:', data);
+      localStorage.setItem(ACCESS_TOKEN_KEY, data.token);
 
       if (data.user) {
-        localStorage.setItem("user", JSON.stringify(data.user));
-        setGreeting(`Welcome back, ${data.user.username}!`);
+        localStorage.setItem(USER_KEY, JSON.stringify(data.user));
+        setUser(data.user);
+        console.log('User after line 57', data.user);
       }
     } else {
       const errorData = await response.json();
@@ -77,18 +63,21 @@ const Homepage = () => {
     }
 
     
+    
   }
 
+  console.log(user);
   
 
   return (
     <>
-      {greeting ? (
-        <h1 className={styles.mainHeader}>{greeting}</h1>
+      {user != null && user.username ? (
+        <h1 className={styles.mainHeader}>{`Welcome back, ${user.username}`}</h1>
       ) : (
-        <h1 className={styles.mainHeader}>Author Frontend</h1>
+        <h1 className={styles.mainHeader}>Bloggy McBlogFace</h1>
       )}
-      <form method="POST">
+      {!user && loading == false ? (
+        <form method="POST">
         <label htmlFor="usernameInput">Username</label>
         <input
           type="text"
@@ -115,6 +104,9 @@ const Homepage = () => {
           log my ass in
         </button>
       </form>
+      ) : (
+        <h1>You Are Logged In My Guy</h1>
+      )}
       <div>
         {posts.map((postCard) => {
           return (
