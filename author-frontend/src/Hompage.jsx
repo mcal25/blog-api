@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import styles from "./Homepage.module.css";
 import { useLocation, Link } from "react-router-dom";
 import { BlogContext } from "./BlogContext";
@@ -9,19 +9,24 @@ const Homepage = () => {
   const { pathname } = useLocation();
 
   const { posts } = useContext(BlogContext);
-  
-  let greeting = null;
-  const token = localStorage.getItem("access_token");
-  if (token && localStorage.getItem("user")) {
-    try {
-      const user = JSON.parse(localStorage.getItem("user"));
-      if (user && user.username) {
-        greeting = `Welcome back, ${user.username}!`;
+
+  const [greeting, setGreeting] = useState(null);
+
+  useEffect(() => {
+    const token = localStorage.getItem("access_token");
+    if (token && localStorage.getItem("user")) {
+      try {
+        const user = JSON.parse(localStorage.getItem("user"));
+        if (user && user.username) {
+          setGreeting(`Welcome back, ${user.username}!`);
+        }
+      } catch (err) {
+        console.log(err);
       }
-    } catch(err) {
-      console.log(err);
     }
-  }
+  }, []);
+
+  // let greeting = null;
 
   async function doLogin(e) {
     // console.log("EEEEEEEEEE:", e);
@@ -64,13 +69,17 @@ const Homepage = () => {
 
       if (data.user) {
         localStorage.setItem("user", JSON.stringify(data.user));
+        setGreeting(`Welcome back, ${data.user.username}!`);
       }
-      
     } else {
       const errorData = await response.json();
       console.error("Login failed:", errorData);
     }
+
+    
   }
+
+  
 
   return (
     <>
