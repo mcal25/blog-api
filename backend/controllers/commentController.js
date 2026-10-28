@@ -64,10 +64,11 @@ export async function deleteCommentById(req, res, next) {
 }
 
 export async function addComment(req, res, next) {
+  console.log('req.body:', req.body)
   // Derive the post from the nested route and the author from the verified JWT, never client-supplied IDs.
   const comment = await prisma.comment.create({
     data: {
-      body: req.body.body,
+      body: req.body.comment,
       post: {
         connect: { id: Number(req.params.postid) },
       },

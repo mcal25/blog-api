@@ -3,10 +3,12 @@
 import { useContext, useEffect, useState } from "react";
 import { helperURLFunction } from "./helperFunctions";
 import { useParams } from "react-router-dom";
+import { ACCESS_TOKEN_KEY } from "./constants.js";
 import { BlogContext } from "./BlogContext";
 
 const Comments = () => {
   const [comments, setComments] = useState([]);
+  const [comment, setComment] = useState("");
   const params = useParams();
   console.log("comments:", comments);
   useEffect(() => {
@@ -27,18 +29,34 @@ const Comments = () => {
     }
     getAllCommentsForPost();
   }, []);
-  // 1: DONE make it so func runs when button pressed 
+  // 1: DONE make it so func runs when button pressed
   // 2: DONE make it so that function gets value from text box when it runs
   // 3: make it so that value gets sent to backend
   async function addNewComment() {
-    console.log("Inside addnewcomment", "Add new comment func hit")
-    const elementWeWant = document.getElementById("new-comment-textarea");
-    const commentWeWant = elementWeWant.textContent;
+    console.log('addNewComment start');
     await fetch(helperURLFunction(`post/${params.postId}/comments/`), {
-      method:"POST",
-      body: commentWeWant,
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${localStorage.getItem(ACCESS_TOKEN_KEY)}`
+      },
+      body: JSON.stringify({
+        comment: comment,
+      })
     });
+    console.log('addNewComment end');
   }
+
+    // const response = await fetch(helperURLFunction(`auth/login`), {
+    //   method: "POST",
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //   },
+    //   body: JSON.stringify({
+    //     username: username,
+    //     password: password,
+    //   }),
+    // });
 
   return (
     <>
@@ -59,20 +77,29 @@ const Comments = () => {
             Your comment:
           </h3>
           <div className="modal-action">
-            <form method="POST" action="" >
+            <form method="POST" action="">
               <textarea
                 name="new-comment-textarea"
                 id="new-comment-textarea"
                 className="bg-amber-500 p-2 min-w-75 block"
+                value={comment}
+                onChange={(e) => {
+                  setComment(e.target.value);
+                  console.log('THE COMMENT OF CONCERN:', comment);
+                }
+              }
               ></textarea>
               <div className="flex justify-between">
                 <button className="btn border-4 border-orange-800 rounded-md mt-4 p-1">
                   Close
                 </button>
-                <button className="btn border-4 border-green-500 rounded-md mt-4 p-1" onClick={(e) => {
-                  e.preventDefault();
-                  addNewComment();
-                }}>
+                <button
+                  className="btn border-4 border-green-500 rounded-md mt-4 p-1"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    addNewComment();
+                  }}
+                >
                   Submit
                 </button>
               </div>
