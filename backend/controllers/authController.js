@@ -14,24 +14,30 @@ export async function submitSignup(req, res, next) {
 
     const hashedPassword = await bcrypt.hash(password, 12);
     const user = await prisma.user.create({
-      data: { username, password: hashedPassword },
+      data: { username, password: hashedPassword, isAdmin: false },
       // Return only public account fields; never include the stored password hash in the API response.
       select: { id: true, username: true, isAdmin: true },
     });
 
-    return res.status(201).json({ user });
+    const token = jwt.sign({ sub: user.id }, process.env.JWT_SECRET_KEY, {
+      expiresIn: "1hr",
+    });
+
+    return res.status(201).json({
+      token,
+      user: { ...user, id: String(user.id) },
+    });
   } catch (error) {
+    if (error.code === "P2002") {
+      return res.status(409).json({ error: "Username is already taken" });
+    }
     next(error);
   }
 }
 
 export function submitLogin(req, res, next) {
-
-  console.log("submitLogin backend req", req.body);
-
   passport.authenticate("local", { session: false }, (error, user, info) => {
     if (error) {
-      console.log('Are we hitting this error section?:', "We sure are");
       return next(error);
     }
 
@@ -58,6 +64,5 @@ export function submitLogin(req, res, next) {
 
 export function submitLogout(req, res) {
   // JWTs are stateless, so the client clears its saved token after this acknowledgment.
-  console.log('Hitting backend logout function?:', 'hitting backend logout');
   return res.sendStatus(204);
 }

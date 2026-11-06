@@ -12,7 +12,7 @@ export async function getAllPosts(req, res) {
 export async function getAllPostsForPublic(req, res) {
   // Public readers must not receive drafts, even if they know a draft's ID.
   const posts = await prisma.post.findMany({
-    where: {},
+    where: { isPublished: true },
     orderBy: { createdAt: "desc" },
     include: { _count: { select: { comments: true } } },
   });
@@ -21,7 +21,6 @@ export async function getAllPostsForPublic(req, res) {
 }
 
 export async function getPostById(req, res) {
-  console.log(Number(req.params.postid));
   const post = await prisma.post.findFirst({
     // Combining ID and published status makes a draft look unavailable to public readers.
     where: { id: Number(req.params.postid), isPublished: true },
@@ -47,33 +46,25 @@ export async function getPostByIdForAdmin(req, res) {
   res.json(post);
 }
 
-export async function editPostById(req, res, next) {
-  console.log("request body:", req.body);
-  const post = await prisma.post.upsert({
+export async function editPostById(req, res) {
+  await prisma.post.update({
     where: { id: Number(req.params.postid) },
-    update: {
+    data: {
       title: req.body.title,
       body: req.body.body,
     },
-    create: {
-      title: req.body.title,
-      body: req.body.body,
-      isPublished: false,
-      // Associate a newly created post with the authenticated admin, not a hard-coded account.
-      userId: req.user.id,
-    },
   });
-  res.status(204).json();
+  return res.sendStatus(204);
 }
 
-export async function deletePostById(req, res, next) {
-  const post = await prisma.post.delete({
+export async function deletePostById(req, res) {
+  await prisma.post.delete({
     where: { id: Number(req.params.postid) },
   });
-  res.send(200).json();
+  return res.sendStatus(204);
 }
 
-export async function addPost(req, res, next) {
+export async function addPost(req, res) {
   const post = await prisma.post.create({
     data: {
       body: req.body.body,

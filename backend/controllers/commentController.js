@@ -1,23 +1,23 @@
-import { Connection } from "pg";
 import { prisma } from "../lib/prisma.js";
 
-export async function getAllCommentsByPostId(req, res, next) {
+export async function getAllCommentsByPostId(req, res) {
   const comments = await prisma.comment.findMany({
     where: { postId: Number(req.params.postid) },
     orderBy: { createdAt: "desc" },
+    include: { user: { select: { username: true } } },
   });
   res.json(comments);
 }
 
-export async function getCommentById(req, res, next) {
-  console.log(req.params);
+export async function getCommentById(req, res) {
   const comment = await prisma.comment.findFirst({
     where: { id: Number(req.params.commentid) },
+    include: { user: { select: { username: true } } },
   });
   res.json(comment);
 }
 
-export async function editCommentById(req, res, next) {
+export async function editCommentById(req, res) {
   // Look up the comment first so authorization can use its actual database owner.
   const existingComment = await prisma.comment.findUnique({
     where: { id: Number(req.params.commentid) },
@@ -32,7 +32,7 @@ export async function editCommentById(req, res, next) {
     return res.status(403).json({ error: "You can only edit your own comments" });
   }
 
-  const comment = await prisma.comment.update({
+  await prisma.comment.update({
     where: { id: existingComment.id },
     data: { body: req.body.body },
   });
@@ -41,7 +41,7 @@ export async function editCommentById(req, res, next) {
   return res.sendStatus(204);
 }
 
-export async function deleteCommentById(req, res, next) {
+export async function deleteCommentById(req, res) {
   // Look up the comment first so authorization can use its actual database owner.
   const existingComment = await prisma.comment.findUnique({
     where: { id: Number(req.params.commentid) },
@@ -64,8 +64,7 @@ export async function deleteCommentById(req, res, next) {
   return res.sendStatus(204);
 }
 
-export async function addComment(req, res, next) {
-  console.log('req.body:', req.body)
+export async function addComment(req, res) {
   // Derive the post from the nested route and the author from the verified JWT, never client-supplied IDs.
   const comment = await prisma.comment.create({
     data: {
@@ -77,6 +76,7 @@ export async function addComment(req, res, next) {
         connect: { id: req.user.id },
       },
     },
+    include: { user: { select: { username: true } } },
   });
 
   // Return the created comment so clients can use its ID and confirm its author.

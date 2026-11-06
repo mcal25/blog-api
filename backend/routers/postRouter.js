@@ -32,7 +32,7 @@ postRouter.get("/admin/:postid", requireJwt, requireAdmin, getPostByIdForAdmin);
 postRouter.get("/collection", getAllPostsForPublic);
 postRouter.get("/:postid", getPostById);
 
-// Creating, editing, and deleting posts are author actions, so require both a valid JWT and admin status.
+// Only the author/admin may create, edit, or delete posts.
 postRouter.post("/", requireJwt, requireAdmin, addPost);
 postRouter.put("/:postid", requireJwt, requireAdmin, editPostById);
 postRouter.delete("/:postid", requireJwt, requireAdmin, deletePostById);
