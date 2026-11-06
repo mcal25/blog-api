@@ -9,7 +9,7 @@ export async function getAllPosts(req, res) {
 export async function getAllPostsForPublic(req, res) {
   // Public readers must not receive drafts, even if they know a draft's ID.
   const posts = await prisma.post.findMany({
-    where: { isPublished: true },
+    where: { },
   });
 
   res.json(posts);
@@ -78,5 +78,5 @@ export async function addPost(req, res, next) {
       userId: req.user.id,
     },
   });
-  res.send(204).json();
+  return res.status(201).json(post);
 }

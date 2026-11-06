@@ -9,7 +9,7 @@ import { ACCESS_TOKEN_KEY, USER_KEY } from "./constants";
 const Homepage = () => {
   const { pathname } = useLocation();
 
-  const { posts, user, setUser } = useContext(BlogContext);
+  const { posts, setPosts, user, setUser } = useContext(BlogContext);
   const [loading, setLoading] = useState(true);
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
@@ -63,17 +63,24 @@ const Homepage = () => {
   }
 
   async function addNewPost() {
-    await fetch(helperURLFunction(`post/`), {
+    const response = await fetch(helperURLFunction(`post/`), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${localStorage.getItem(ACCESS_TOKEN_KEY)}`,
+        Authorization: `Bearer ${localStorage.getItem(ACCESS_TOKEN_KEY)}`,
       },
       body: JSON.stringify({
         body: body,
         title: title,
       }),
     });
+    if (!response.ok) {
+      throw new Error(`Failed to add post: ${response.status}`);
+    }
+    const newPost = await response.json();
+    setPosts((currentPosts) => [...currentPosts, newPost]);
+    setTitle("");
+    setBody("");
   }
 
   console.log(user);
@@ -149,7 +156,18 @@ const Homepage = () => {
                 Post Body:
               </h3>
               <div className="modal-action">
-                <form method="POST" action="">
+                <form
+                  method="POST"
+                  onSubmit={async (e) => {
+                    e.preventDefault();
+                    try {
+                      await addNewPost();
+                      document.getElementById("new_post_modal")?.close();
+                    } catch (err) {
+                      console.error(err);
+                    }
+                  }}
+                >
                   <textarea
                     name="new-comment-textarea"
                     id="new-comment-textarea"
@@ -161,16 +179,16 @@ const Homepage = () => {
                     }}
                   ></textarea>
                   <div className="flex justify-between">
-                    <button className="btn border-4 border-orange-800 rounded-md mt-4 p-1">
-                      Close
-                    </button>
                     <button
-                      className="btn border-4 border-green-500 rounded-md mt-4 p-1"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        addNewPost();
+                      className="btn border-4 border-orange-800 rounded-md mt-4 p-1"
+                      type="button"
+                      onClick={() => {
+                        document.getElementById("new_post_modal")?.close();
                       }}
                     >
+                      Close
+                    </button>
+                    <button className="btn border-4 border-green-500 rounded-md mt-4 p-1">
                       Submit
                     </button>
                   </div>

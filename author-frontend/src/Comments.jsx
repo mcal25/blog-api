@@ -12,6 +12,7 @@ const Comments = () => {
   const params = useParams();
   console.log("comments:", comments);
   useEffect(() => {
+    console.log('useEffect is running');
     async function getAllCommentsForPost() {
       try {
         console.log(
@@ -34,7 +35,7 @@ const Comments = () => {
   // 3: make it so that value gets sent to backend
   async function addNewComment() {
     console.log('addNewComment start');
-    await fetch(helperURLFunction(`post/${params.postId}/comments/`), {
+    const response = await fetch(helperURLFunction(`post/${params.postId}/comments/`), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -44,6 +45,12 @@ const Comments = () => {
         comment: comment,
       })
     });
+    if (!response.ok) {
+      throw new Error(`Failed to add comment: ${response.status}`);
+    }
+    const newComment = await response.json();
+    setComments((currentComments) => [...currentComments, newComment]);
+    setComment("");
     console.log('addNewComment end');
   }
 
@@ -77,7 +84,18 @@ const Comments = () => {
             Your comment:
           </h3>
           <div className="modal-action">
-            <form method="POST" action="">
+            <form
+              method="POST"
+              onSubmit={async (e) => {
+                e.preventDefault();
+                try {
+                  await addNewComment();
+                  document.getElementById("my_modal_1")?.close();
+                } catch (err) {
+                  console.error(err);
+                }
+              }}
+            >
               <textarea
                 name="new-comment-textarea"
                 id="new-comment-textarea"
@@ -90,15 +108,18 @@ const Comments = () => {
               }
               ></textarea>
               <div className="flex justify-between">
-                <button className="btn border-4 border-orange-800 rounded-md mt-4 p-1">
+                <button
+                  type="button"
+                  className="btn border-4 border-orange-800 rounded-md mt-4 p-1"
+                  onClick={() =>
+                    document.getElementById("my_modal_1")?.close()
+                  }
+                >
                   Close
                 </button>
                 <button
+                  type="submit"
                   className="btn border-4 border-green-500 rounded-md mt-4 p-1"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    addNewComment();
-                  }}
                 >
                   Submit
                 </button>
