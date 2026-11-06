@@ -5,8 +5,11 @@ import { ACCESS_TOKEN_KEY } from "./constants.js";
 import { BlogContext } from "./BlogContext";
 
 const Comments = () => {
+  const { user, setPosts } = useContext(BlogContext);
   const [comments, setComments] = useState([]);
   const [comment, setComment] = useState("");
+  const [editingComment, setEditingComment] = useState(null);
+  const [editBody, setEditBody] = useState("");
   const params = useParams();
   console.log("comments:", comments);
   useEffect(() => {
@@ -48,8 +51,84 @@ const Comments = () => {
     }
     const newComment = await response.json();
     setComments((currentComments) => [newComment, ...currentComments]);
+    setPosts((posts) =>
+      posts.map((post) =>
+        String(post.id) === params.postId
+          ? {
+              ...post,
+              _count: { ...post._count, comments: (post._count?.comments ?? 0) + 1 },
+            }
+          : post,
+      ),
+    );
     setComment("");
     console.log('addNewComment end');
+  }
+
+  async function saveCommentEdit(e) {
+    e.preventDefault();
+    const response = await fetch(
+      helperURLFunction(
+        `post/${params.postId}/comments/${editingComment.id}`,
+      ),
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem(ACCESS_TOKEN_KEY)}`,
+        },
+        body: JSON.stringify({ body: editBody }),
+      },
+    );
+    if (!response.ok) {
+      window.alert(`Could not update comment (${response.status}).`);
+      return;
+    }
+
+    setComments((currentComments) =>
+      currentComments.map((currentComment) =>
+        currentComment.id === editingComment.id
+          ? { ...currentComment, body: editBody }
+          : currentComment,
+      ),
+    );
+    setEditingComment(null);
+    document.getElementById("edit_comment_modal")?.close();
+  }
+
+  async function deleteComment(commentId) {
+    if (!window.confirm("Delete this comment?")) return;
+
+    const response = await fetch(
+      helperURLFunction(`post/${params.postId}/comments/${commentId}`),
+      {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem(ACCESS_TOKEN_KEY)}`,
+        },
+      },
+    );
+    if (!response.ok) {
+      window.alert(`Could not delete comment (${response.status}).`);
+      return;
+    }
+
+    setComments((currentComments) =>
+      currentComments.filter((currentComment) => currentComment.id !== commentId),
+    );
+    setPosts((posts) =>
+      posts.map((post) =>
+        String(post.id) === params.postId
+          ? {
+              ...post,
+              _count: {
+                ...post._count,
+                comments: Math.max(0, (post._count?.comments ?? 0) - 1),
+              },
+            }
+          : post,
+      ),
+    );
   }
 
     // const response = await fetch(helperURLFunction(`auth/login`), {
@@ -122,11 +201,63 @@ const Comments = () => {
           </div>
         </div>
       </dialog>
+      <dialog id="edit_comment_modal" className="modal">
+        <form className="comment-modal-form" onSubmit={saveCommentEdit}>
+          <h3>Edit comment</h3>
+          <textarea
+            value={editBody}
+            onChange={(e) => setEditBody(e.target.value)}
+          />
+          <div className="modal-actions">
+            <button
+              type="button"
+              className="button-secondary"
+              onClick={() => {
+                setEditingComment(null);
+                document.getElementById("edit_comment_modal")?.close();
+              }}
+            >
+              Cancel
+            </button>
+            <button type="submit">Save</button>
+          </div>
+        </form>
+      </dialog>
       <div className="comment-list">
         {comments.map((comment) => {
+          const canManage =
+            user?.isAdmin || String(comment.userId) === String(user?.id);
           return (
             <div className="comment-card" key={comment.id}>
               <p className="comment-body">{comment.body}</p>
+              {canManage && (
+                <div className="card-actions">
+                  <button
+                    type="button"
+                    className="icon-button"
+                    aria-label="Edit comment"
+                    title="Edit comment"
+                    onClick={() => {
+                      setEditingComment(comment);
+                      setEditBody(comment.body);
+                      document
+                        .getElementById("edit_comment_modal")
+                        ?.showModal();
+                    }}
+                  >
+                    ✏
+                  </button>
+                  <button
+                    type="button"
+                    className="icon-button delete-button"
+                    aria-label="Delete comment"
+                    title="Delete comment"
+                    onClick={() => deleteComment(comment.id)}
+                  >
+                    🗑
+                  </button>
+                </div>
+              )}
             </div>
           );
         })}

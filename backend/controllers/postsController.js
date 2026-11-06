@@ -4,6 +4,7 @@ export async function getAllPosts(req, res) {
   // This handler is mounted only on admin routes, so it intentionally includes drafts.
   const posts = await prisma.post.findMany({
     orderBy: { createdAt: "desc" },
+    include: { _count: { select: { comments: true } } },
   });
   res.json(posts);
 }
@@ -13,6 +14,7 @@ export async function getAllPostsForPublic(req, res) {
   const posts = await prisma.post.findMany({
     where: {},
     orderBy: { createdAt: "desc" },
+    include: { _count: { select: { comments: true } } },
   });
 
   res.json(posts);
@@ -80,6 +82,7 @@ export async function addPost(req, res, next) {
       // Passport populated req.user after the route verified the admin's JWT.
       userId: req.user.id,
     },
+    include: { _count: { select: { comments: true } } },
   });
   return res.status(201).json(post);
 }

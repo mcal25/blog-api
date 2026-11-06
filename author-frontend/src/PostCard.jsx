@@ -1,14 +1,11 @@
-import { useState, useContext } from "react";
-import { BlogContext } from "./BlogContext";
-
-
-
-const PostCard = ({ postCard } ) => {
-
-    return <div className="post-card">
-        <h3>{postCard.title}</h3>
-        <p>{postCard.body}</p>
-    </div>
-}
+const PostCard = ({ postCard }) => (
+  <div className="post-card">
+    <h3>{postCard.title}</h3>
+    <p>{postCard.body}</p>
+    <small className="post-comment-count">
+      💬 {postCard._count?.comments ?? 0} comments
+    </small>
+  </div>
+);
 
 export { PostCard };
