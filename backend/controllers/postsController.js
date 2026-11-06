@@ -47,12 +47,17 @@ export async function getPostByIdForAdmin(req, res) {
 }
 
 export async function editPostById(req, res) {
+  const data = {
+    title: req.body.title,
+    body: req.body.body,
+  };
+  if (typeof req.body.isPublished === "boolean") {
+    data.isPublished = req.body.isPublished;
+  }
+
   await prisma.post.update({
     where: { id: Number(req.params.postid) },
-    data: {
-      title: req.body.title,
-      body: req.body.body,
-    },
+    data,
   });
   return res.sendStatus(204);
 }
@@ -69,7 +74,7 @@ export async function addPost(req, res) {
     data: {
       body: req.body.body,
       title: req.body.title,
-      isPublished: false,
+      isPublished: req.body.isPublished === true,
       // Passport populated req.user after the route verified the admin's JWT.
       userId: req.user.id,
     },

@@ -7,16 +7,72 @@
 :root {
   color-scheme: dark;
   font: 16px/1.5 system-ui, sans-serif;
-  color: #e5e7eb;
-  background:
+  --page-background:
     radial-gradient(ellipse at 10% 0%, rgb(14 116 144 / 15%), transparent 34rem),
     radial-gradient(ellipse at 100% 20%, rgb(37 99 235 / 10%), transparent 30rem),
     #0b1220;
+  --text-color: #e5e7eb;
   --surface: rgb(23 35 54 / 88%);
   --surface-raised: #1d2b40;
+  --card-background: linear-gradient(145deg, var(--surface), rgb(17 27 43 / 94%));
+  --header-background: linear-gradient(110deg, rgb(20 36 57 / 88%), rgb(14 25 42 / 82%));
+  --input-background: rgb(10 18 32 / 72%);
+  --input-color: #f9fafb;
+  --title-color: #bfdbfe;
+  --body-color: #d3e2f2;
+  --comment-color: #d1e4e6;
+  --metadata-color: #a7bed6;
+  --label-color: #b8caff;
+  --brand-color: #67e8f9;
+  --heading-accent: #a5f3fc;
+  --secondary-text: #f8fafc;
+  --error-color: #fca5a5;
+  --secondary-border: var(--border);
+  --welcome-color: #cbd5e1;
+  --button-background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  --button-hover-background: linear-gradient(135deg, #1e40af, #1e3a8a);
+  --secondary-background: #2b3b52;
+  --secondary-hover-background: #3a4d66;
+  --modal-background: linear-gradient(145deg, #1d2b40, #111b2b);
+  --shadow-color: rgb(0 0 0 / 14%);
   --border: rgb(148 163 184 / 18%);
-  --muted: #9ca3af;
   --focus: #38bdf8;
+  color: var(--text-color);
+  background: var(--page-background);
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  --page-background:
+    radial-gradient(ellipse at 10% 0%, rgb(8 145 178 / 8%), transparent 34rem),
+    radial-gradient(ellipse at 100% 20%, rgb(37 99 235 / 6%), transparent 30rem),
+    #f1f5f9;
+  --text-color: #1e293b;
+  --surface: #ffffff;
+  --surface-raised: #e2e8f0;
+  --card-background: linear-gradient(145deg, #ffffff, #f8fafc);
+  --header-background: linear-gradient(110deg, #ffffff, #eaf2f8);
+  --input-background: #ffffff;
+  --input-color: #1e293b;
+  --title-color: #1d4ed8;
+  --body-color: #344b63;
+  --comment-color: #3f5963;
+  --metadata-color: #526b85;
+  --label-color: #315f9d;
+  --brand-color: #0e7490;
+  --heading-accent: #0e7490;
+  --secondary-text: #0c4a6e;
+  --secondary-background: #cffafe;
+  --secondary-hover-background: #a5f3fc;
+  --secondary-border: #0891b2;
+  --welcome-color: #0c4a6e;
+  --error-color: #b91c1c;
+  --button-background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  --button-hover-background: linear-gradient(135deg, #1e40af, #1e3a8a);
+  --modal-background: linear-gradient(145deg, #ffffff, #f1f5f9);
+  --shadow-color: rgb(15 23 42 / 10%);
+  --border: rgb(71 85 105 / 20%);
+  --focus: #0284c7;
 }
 
 body {

@@ -1,13 +1,21 @@
 import { Outlet } from "react-router-dom";
 import { apiRequest } from "./helperFunctions";
 import { BlogContext } from "./BlogContext.js";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { ACCESS_TOKEN_KEY, USER_KEY } from "./constants";
 
 const Layout = () => {
   const { user, setUser } = useContext(BlogContext);
   const [authMode, setAuthMode] = useState("login");
   const [authError, setAuthError] = useState("");
+  const [theme, setTheme] = useState(
+    () => localStorage.getItem("author-theme") === "light" ? "light" : "dark",
+  );
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    localStorage.setItem("author-theme", theme);
+  }, [theme]);
 
   async function authenticate(e) {
     e.preventDefault();
@@ -43,6 +51,26 @@ const Layout = () => {
     document.getElementById("auth-dialog")?.showModal();
   }
 
+  const themeToggle = (
+    <button
+      className="button-secondary theme-toggle"
+      type="button"
+      aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} view`}
+      onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+    >
+      {theme === "dark" ? (
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="12" r="4" />
+          <path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42" />
+        </svg>
+      ) : (
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M20.9 13A9 9 0 0 1 11 3.1 9 9 0 1 0 20.9 13Z" />
+        </svg>
+      )}
+    </button>
+  );
+
   return (
     <>
       <header className="app-header">
@@ -56,11 +84,12 @@ const Layout = () => {
         </a>
         {user && localStorage.getItem(ACCESS_TOKEN_KEY) ? (
           <div className="header-actions">
-            <span>Signed in as {user.username}</span>
+            {themeToggle}
             <button className="button-secondary" onClick={doLogout}>Log out</button>
           </div>
         ) : (
           <div className="header-actions">
+            {themeToggle}
             <button onClick={() => openAuth("login")}>Log in</button>
             <button className="button-secondary" onClick={() => openAuth("signup")}>Sign up</button>
           </div>

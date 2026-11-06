@@ -44,6 +44,14 @@ function App() {
   });
   const [authMode, setAuthMode] = useState("login");
   const [error, setError] = useState("");
+  const [theme, setTheme] = useState(
+    () => localStorage.getItem("reader-theme") === "light" ? "light" : "dark",
+  );
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    localStorage.setItem("reader-theme", theme);
+  }, [theme]);
 
   useEffect(() => {
     api("/post/collection")
@@ -105,6 +113,7 @@ function App() {
     setPosts((current) =>
       changeCommentCount(current, selectedPost.id, 1),
     );
+    document.getElementById("new-comment")?.close();
   }
 
   async function saveComment(event) {
@@ -152,6 +161,26 @@ function App() {
     setUser(null);
   }
 
+  const themeToggle = (
+    <button
+      className="secondary-button theme-toggle"
+      type="button"
+      aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} view`}
+      onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+    >
+      {theme === "dark" ? (
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="12" r="4" />
+          <path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42" />
+        </svg>
+      ) : (
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M20.9 13A9 9 0 0 1 11 3.1 9 9 0 1 0 20.9 13Z" />
+        </svg>
+      )}
+    </button>
+  );
+
   return (
     <main className="reader">
       <header className="page-header">
@@ -167,11 +196,12 @@ function App() {
         </h1>
         {user && localStorage.getItem("access_token") ? (
           <div className="account">
-            <span>Signed in as {user.username}</span>
+            {themeToggle}
             <button className="secondary-button" onClick={logout}>Log out</button>
           </div>
         ) : (
           <div className="header-actions">
+            {themeToggle}
             <button onClick={() => {
               setAuthMode("login");
               document.getElementById("auth-dialog")?.showModal();
@@ -183,6 +213,10 @@ function App() {
           </div>
         )}
       </header>
+
+      {user?.username && (
+        <p className="welcome-message">Welcome back, {user.username}</p>
+      )}
 
       {error && <p className="error">{error}</p>}
 
@@ -231,6 +265,16 @@ function App() {
             <small>💬 {comments.length} comments</small>
           </article>
           <h2>Comments</h2>
+          {user && (
+            <button
+              className="new-comment-button"
+              onClick={() =>
+                document.getElementById("new-comment")?.showModal()
+              }
+            >
+              New comment
+            </button>
+          )}
           <div className="comment-list">
             {commentsLoading && <p>Loading comments…</p>}
             {commentsError && <p className="error">{commentsError}</p>}
@@ -270,18 +314,6 @@ function App() {
                 </article>
               );
             })}
-            {user && (
-              <form className="comment-form" onSubmit={addComment}>
-                <textarea
-                  aria-label="Your comment"
-                  placeholder="Write a comment..."
-                  value={commentText}
-                  onChange={(event) => setCommentText(event.target.value)}
-                  required
-                />
-                <button type="submit">Add comment</button>
-              </form>
-            )}
             {!user && <p>Sign in to leave a comment.</p>}
             {!commentsLoading && !commentsError && comments.length === 0 && (
               <p>No comments yet.</p>
@@ -331,6 +363,28 @@ function App() {
               Cancel
             </button>
             <button type="submit">Save</button>
+          </div>
+        </form>
+      </dialog>
+      <dialog id="new-comment" className="modal">
+        <form className="edit-form" onSubmit={addComment}>
+          <h2>Your comment</h2>
+          <textarea
+            aria-label="Your comment"
+            placeholder="Write a comment..."
+            value={commentText}
+            onChange={(event) => setCommentText(event.target.value)}
+            required
+          />
+          <div className="form-actions">
+            <button
+              type="button"
+              className="secondary-button"
+              onClick={() => document.getElementById("new-comment")?.close()}
+            >
+              Cancel
+            </button>
+            <button type="submit">Submit</button>
           </div>
         </form>
       </dialog>

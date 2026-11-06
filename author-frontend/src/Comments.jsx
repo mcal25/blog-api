@@ -103,7 +103,7 @@ const Comments = () => {
   }
 
   return (
-    <>
+    <section className="comments-section">
       <h3 className="comments-heading">Comments:</h3>
       <button
         className="new-comment-button"
@@ -206,7 +206,7 @@ const Comments = () => {
           );
         })}
       </div>
-    </>
+    </section>
   );
 };
 

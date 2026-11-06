@@ -8,6 +8,7 @@ const Homepage = () => {
   const { posts, setPosts, user } = useContext(BlogContext);
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
+  const [isPublished, setIsPublished] = useState(false);
   const [editingPost, setEditingPost] = useState(null);
   const [editTitle, setEditTitle] = useState("");
   const [editBody, setEditBody] = useState("");
@@ -15,7 +16,7 @@ const Homepage = () => {
   async function addNewPost() {
     const response = await apiRequest("post/", {
       method: "POST",
-      body: JSON.stringify({ body, title }),
+      body: JSON.stringify({ body, title, isPublished }),
     });
     if (!response.ok) {
       throw new Error(`Failed to add post: ${response.status}`);
@@ -24,6 +25,7 @@ const Homepage = () => {
     setPosts((currentPosts) => [newPost, ...currentPosts]);
     setTitle("");
     setBody("");
+    setIsPublished(false);
   }
 
   async function savePostEdit(e) {
@@ -104,6 +106,14 @@ const Homepage = () => {
                 value={body}
                 onChange={(event) => setBody(event.target.value)}
               />
+              <label className="publish-option">
+                <input
+                  type="checkbox"
+                  checked={isPublished}
+                  onChange={(event) => setIsPublished(event.target.checked)}
+                />
+                Publish immediately
+              </label>
               <div className="modal-actions">
                 <button
                   className="button-secondary"
@@ -154,7 +164,7 @@ const Homepage = () => {
         {posts.map((postCard) => (
           <div className="post-entry" key={postCard.id}>
             <Link className="post-card-link" to={`/post/${postCard.id}`}>
-              <PostCard postCard={postCard} />
+              <PostCard postCard={postCard} showPublicationStatus={user?.isAdmin} />
             </Link>
             {user?.isAdmin && (
               <div className="card-actions">
