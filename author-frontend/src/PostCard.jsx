@@ -5,7 +5,7 @@ import { BlogContext } from "./BlogContext";
 
 const PostCard = ({ postCard } ) => {
 
-    return <div>
+    return <div className="post-card">
         <h3>{postCard.title}</h3>
         <p>{postCard.body}</p>
     </div>

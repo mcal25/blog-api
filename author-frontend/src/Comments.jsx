@@ -1,5 +1,3 @@
-// app.use("/post/:postid/comments", commentRouter);
-
 import { useContext, useEffect, useState } from "react";
 import { helperURLFunction } from "./helperFunctions";
 import { useParams } from "react-router-dom";
@@ -49,7 +47,7 @@ const Comments = () => {
       throw new Error(`Failed to add comment: ${response.status}`);
     }
     const newComment = await response.json();
-    setComments((currentComments) => [...currentComments, newComment]);
+    setComments((currentComments) => [newComment, ...currentComments]);
     setComment("");
     console.log('addNewComment end');
   }
@@ -67,24 +65,22 @@ const Comments = () => {
 
   return (
     <>
-      <h3 className="text-2xl mt-3">Comments:</h3>
+      <h3 className="comments-heading">Comments:</h3>
       <button
-        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-200 ease-in-out transform hover:scale-105 mt-3 mb-3"
+        className="new-comment-button"
         onClick={() => document.getElementById("my_modal_1").showModal()}
       >
         New comment
       </button>
       <dialog
         id="my_modal_1"
-        // className="modal p-1.5 fixed inset-0 flex items-center justify-center bg-black/50"
-        className="p-5 rounded-lg shadow-xl backdrop:bg-black/50 open:flex open:flex-col open:bg-amber-200 items-center justify-center m-auto min-w-100"
+        className="modal"
       >
-        <div className="modal-box">
-          <h3 className="font-bold text-lg text-center pt-1 pb-4">
-            Your comment:
-          </h3>
-          <div className="modal-action">
+        <div>
+          <h3>Your comment:</h3>
+          <div>
             <form
+              className="comment-modal-form"
               method="POST"
               onSubmit={async (e) => {
                 e.preventDefault();
@@ -99,7 +95,6 @@ const Comments = () => {
               <textarea
                 name="new-comment-textarea"
                 id="new-comment-textarea"
-                className="bg-amber-500 p-2 min-w-75 block"
                 value={comment}
                 onChange={(e) => {
                   setComment(e.target.value);
@@ -107,10 +102,10 @@ const Comments = () => {
                 }
               }
               ></textarea>
-              <div className="flex justify-between">
+              <div className="modal-actions">
                 <button
                   type="button"
-                  className="btn border-4 border-orange-800 rounded-md mt-4 p-1"
+                  className="button-secondary"
                   onClick={() =>
                     document.getElementById("my_modal_1")?.close()
                   }
@@ -119,7 +114,6 @@ const Comments = () => {
                 </button>
                 <button
                   type="submit"
-                  className="btn border-4 border-green-500 rounded-md mt-4 p-1"
                 >
                   Submit
                 </button>
@@ -128,14 +122,12 @@ const Comments = () => {
           </div>
         </div>
       </dialog>
-      <div>
+      <div className="comment-list">
         {comments.map((comment) => {
           return (
-            <>
-              <div>
-                <p>{comment.body}</p>
-              </div>
-            </>
+            <div className="comment-card" key={comment.id}>
+              <p className="comment-body">{comment.body}</p>
+            </div>
           );
         })}
       </div>

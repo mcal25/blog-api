@@ -24,9 +24,9 @@ const Post = () => {
   }, []);
 
   return (
-    <div>
-      <h3 className="text-4xl">{post?.title}</h3>
-      <p className="mt-5">{post?.body}</p>
+    <div className="post-content">
+      <h3 className="post-title">{post?.title}</h3>
+      <p className="post-body">{post?.body}</p>
       <Comments />
     </div>
   );

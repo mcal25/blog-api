@@ -4,6 +4,7 @@ import { prisma } from "../lib/prisma.js";
 export async function getAllCommentsByPostId(req, res, next) {
   const comments = await prisma.comment.findMany({
     where: { postId: Number(req.params.postid) },
+    orderBy: { createdAt: "desc" },
   });
   res.json(comments);
 }

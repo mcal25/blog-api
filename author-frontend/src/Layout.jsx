@@ -26,7 +26,7 @@ const Layout = () => {
 
   return (
     <>
-      <button onClick={doLogout}>Logout</button>
+      <button className="logout-button" onClick={doLogout}>Logout</button>
       <Outlet></Outlet>
     </>
   );

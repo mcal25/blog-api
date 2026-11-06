@@ -2,14 +2,17 @@ import { prisma } from "../lib/prisma.js";
 
 export async function getAllPosts(req, res) {
   // This handler is mounted only on admin routes, so it intentionally includes drafts.
-  const posts = await prisma.post.findMany();
+  const posts = await prisma.post.findMany({
+    orderBy: { createdAt: "desc" },
+  });
   res.json(posts);
 }
 
 export async function getAllPostsForPublic(req, res) {
   // Public readers must not receive drafts, even if they know a draft's ID.
   const posts = await prisma.post.findMany({
-    where: { },
+    where: {},
+    orderBy: { createdAt: "desc" },
   });
 
   res.json(posts);
